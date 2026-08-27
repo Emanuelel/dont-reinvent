@@ -4,6 +4,22 @@
 
 A Claude Skill that checks Free vs. Build vs. Buy before writing non-trivial code, and actually vets what it finds (license, maintenance, security) instead of stopping at star count.
 
+## Install
+
+As a Claude Code plugin:
+
+```
+/plugin marketplace add Emanuelel/dont-reinvent
+/plugin install dont-reinvent@emanuelel-dont-reinvent
+```
+
+Or manually, by copying the skill into your skills directory:
+
+```
+git clone https://github.com/Emanuelel/dont-reinvent.git
+cp -r dont-reinvent/skills/dont-reinvent ~/.claude/skills/
+```
+
 ## Why this matters more now, not less
 
 Build vs. buy used to be a slow decision. A developer's time and salary were the real cost of "build," so people naturally checked npm, Stack Overflow, or a vendor page first. Buying or reusing was often the *faster* path, and that friction kept the decision honest.

@@ -1,0 +1,24 @@
+{
+  "name": "dont-reinvent",
+  "version": "1.0.0",
+  "description": "Stop your AI coding agent from reinventing the wheel. Checks Free vs. Build vs. Buy before writing non-trivial code, and actually vets what it finds (license, maintenance, security) instead of stopping at star count.",
+  "author": {
+    "name": "Emanuele Lanni",
+    "url": "https://github.com/Emanuelel"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/Emanuelel/dont-reinvent",
+  "keywords": [
+    "claude-skill",
+    "agent-skills",
+    "mcp",
+    "build-vs-buy",
+    "open-source",
+    "dependency-vetting",
+    "license-check",
+    "security-scanning",
+    "token-efficiency",
+    "socket",
+    "github-search"
+  ]
+}

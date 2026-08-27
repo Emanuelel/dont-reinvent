@@ -1,0 +1,34 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "emanuelel-dont-reinvent",
+  "owner": {
+    "name": "Emanuelel"
+  },
+  "metadata": {
+    "description": "A Claude Skill that checks Free vs. Build vs. Buy before writing non-trivial code, and actually vets what it finds (license, maintenance, security) instead of stopping at star count."
+  },
+  "plugins": [
+    {
+      "name": "dont-reinvent",
+      "source": "./",
+      "description": "Vets whether to build a feature from scratch, use an existing free/open-source solution, or pay for a third-party API/service. Reads the actual LICENSE file, checks maintenance signals, and runs a real dependency vulnerability scan before recommending anything.",
+      "author": {
+        "name": "Emanuele Lanni",
+        "url": "https://github.com/Emanuelel"
+      },
+      "category": "development",
+      "homepage": "https://github.com/Emanuelel/dont-reinvent",
+      "keywords": [
+        "claude-skill",
+        "agent-skills",
+        "mcp",
+        "build-vs-buy",
+        "open-source",
+        "dependency-vetting",
+        "license-check",
+        "security-scanning",
+        "token-efficiency"
+      ]
+    }
+  ]
+}
