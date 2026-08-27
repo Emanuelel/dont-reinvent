@@ -33,7 +33,7 @@
 
       .win {
         position: absolute; top: 108px; width: 840px; height: 876px;
-        background: #FDFCFA; border-radius: 16px; overflow: hidden;
+        background: #FAF9F5; border-radius: 16px; overflow: hidden;
         border: 1px solid #E0DCD3;
         box-shadow: 0 18px 44px rgba(60,52,38,0.09), 0 2px 6px rgba(60,52,38,0.05);
       }
@@ -44,7 +44,7 @@
       .dot { width: 11px; height: 11px; border-radius: 50%; }
       .d1 { background: #E8695C; } .d2 { background: #E4B34A; } .d3 { background: #55B455; }
 
-      .body { position: absolute; left: 0; right: 0; top: 42px; bottom: 150px; padding: 8px 28px 0; }
+      .body { position: absolute; left: 0; right: 0; top: 42px; bottom: 222px; padding: 8px 28px 0; }
 
       .ubub {
         float: right; max-width: 560px; background: #F0EEE6; border-radius: 12px;
@@ -58,7 +58,7 @@
 
       /* left: IDE-coloured listing */
       #codewrap {
-        position: absolute; left: 28px; right: 28px; top: 126px; height: 464px; overflow: hidden;
+        position: absolute; left: 28px; right: 28px; top: 126px; height: 424px; overflow: hidden;
         -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 76%, transparent 100%);
         mask-image: linear-gradient(to bottom, #000 0%, #000 76%, transparent 100%);
       }
@@ -108,7 +108,7 @@
       #rec b { font-weight: 400; color: #B0522F; }
 
       /* turn footer */
-      .foot { position: absolute; left: 28px; right: 28px; bottom: 118px; opacity: 0; }
+      .foot { position: absolute; left: 28px; right: 28px; bottom: 154px; opacity: 0; }
       .foot .ran { font-size: 16px; color: #6B6862; margin-bottom: 9px; }
       .foot .stat { display: flex; align-items: center; gap: 11px; font-size: 17px; color: #6B6862; }
       .foot .mark { width: 13px; height: 13px; border-radius: 50%; flex: 0 0 13px; }
@@ -116,14 +116,26 @@
 
       /* composer */
       .comp {
-        position: absolute; left: 28px; right: 28px; bottom: 26px; height: 66px;
-        border: 1px solid #E3E0D6; border-radius: 14px; background: #FFFFFF;
-        display: flex; align-items: center; padding: 0 18px;
-        font-family: "Charter", Georgia, serif; font-size: 19px;
+        position: absolute; left: 28px; right: 28px; bottom: 24px; height: 112px;
+        border: 1px solid #E5E2DA; border-radius: 16px; background: #FFFFFF;
+        padding: 16px 18px 14px;
       }
-      .comp .ph { color: #75726B; position: absolute; }
-      .comp .typed { color: #1F1E1D; opacity: 0; }
-      .comp .cur { display: inline-block; width: 2px; height: 21px; background: #B0522F; margin-left: 3px; vertical-align: -3px; }
+      .comp .line { position: relative; height: 30px; font-family: "Charter", Georgia, serif; font-size: 19px; }
+      .comp .ph { color: #8B8780; position: absolute; }
+      .comp .typed { color: #1F1E1D; opacity: 0; position: absolute; }
+      .crow { position: absolute; left: 18px; right: 18px; bottom: 14px; display: flex; align-items: center; gap: 12px; }
+      .crow .plus { font-size: 25px; color: #75726B; line-height: 1; width: 22px; text-align: center; }
+      .seg { display: flex; align-items: center; background: #F0EEE6; border-radius: 9px; padding: 3px; gap: 2px; }
+      .seg b, .seg i {
+        font-family: "Avenir Next", sans-serif; font-style: normal; font-size: 15px;
+        padding: 5px 13px; border-radius: 7px; font-weight: 400;
+      }
+      .seg b { background: #FFFFFF; color: #1F1E1D; border: 1px solid #E5E2DA; }
+      .seg i { color: #75726B; }
+      .crow .gap { flex: 1; }
+      .crow .model { font-family: "Avenir Next", sans-serif; font-size: 15px; color: #55524C; }
+      .crow .eff   { font-family: "Avenir Next", sans-serif; font-size: 15px; color: #8B8780; }
+      .crow svg { width: 16px; height: 16px; stroke: #75726B; fill: none; stroke-width: 1.7; }
 
       /* ===== scene B ===== */
       #zoom { display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -178,7 +190,7 @@
             <div class="ran">Writing rate-limiter.ts &mdash; <span id="lwrote">0</span> lines</div>
             <div class="stat"><i class="mark m-hot"></i><span><span class="num" id="ltime">0s</span> &middot; <span class="num" id="ltok">0</span> tokens</span></div>
           </div>
-          <div class="comp"><span class="ph" id="lph">Write a message&hellip;</span><span class="typed" id="ltyped"></span></div>
+          <div class="comp"><div class="line"><span class="ph" id="lph">Write a message&hellip;</span><span class="typed" id="ltyped"></span></div><div class="crow"><span class="plus">+</span><span class="seg"><b>Chat</b><i>Cowork</i></span><span class="gap"></span><span class="model">Opus 5</span><span class="eff">Medium</span><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg></div></div>
         </div>
 
         <div id="rwin" class="win">
@@ -202,7 +214,7 @@
             <div class="ran">Ran 1 tool, read 4 files</div>
             <div class="stat"><i class="mark m-cool"></i><span><span class="num" id="rtime">0s</span> &middot; <span class="num" id="rtok">0</span> tokens</span></div>
           </div>
-          <div class="comp"><span class="ph" id="rph">Write a message&hellip;</span><span class="typed" id="rtyped"></span></div>
+          <div class="comp"><div class="line"><span class="ph" id="rph">Write a message&hellip;</span><span class="typed" id="rtyped"></span></div><div class="crow"><span class="plus">+</span><span class="seg"><b>Chat</b><i>Cowork</i></span><span class="gap"></span><span class="model">Opus 5</span><span class="eff">Medium</span><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg></div></div>
         </div>
       </div>
 
@@ -246,7 +258,7 @@
         s = Math.round(s);
         return s < 60 ? s + "s" : Math.floor(s / 60) + "m " + String(s % 60).padStart(2, "0") + "s";
       };
-      const LINE_H = 21, VIEW_H = 464, N = 2615;
+      const LINE_H = 21, VIEW_H = 424, N = 2615;
 
       // 1. windows in
       tl.fromTo(".win", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.42, ease: "power2.out" }, 0);
