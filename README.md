@@ -62,76 +62,55 @@ Roughly half of all test cases correctly said **build**, when the free candidate
 
 ## How it works
 
-The decision flow, and which service does the actual checking at each step. Dotted lines are external services — the skill never asserts a license, a maintenance signal, or a CVE without one of them backing it.
-
 ```mermaid
-flowchart TD
+flowchart LR
     START(["Feature request<br/>'add rate limiting to my API'"]) --> S0
 
-    S0{"Step 0<br/>Both connectors<br/>available?"}
-    S0 -- "either missing" --> WARN["Name what's missing<br/>Say what is lost without it<br/>Offer the exact way to connect"]
-    WARN --> ASK{"Connect now?"}
-    ASK -- "no" --> DEGRADE["Proceed with weaker fallback<br/>flagged in the output"]
-    ASK -- "yes" --> S1
-    DEGRADE --> S1
+    S0{"Step 0<br/>Connectors<br/>available?"}
+    S0 -- "either missing" --> WARN["Name what is missing<br/>and what is lost without it<br/>Offer the exact fix<br/>Never silently degrade"]
+    WARN --> S1
     S0 -- "both present" --> S1
 
-    S1["Step 1 · Search<br/>2-3 query variations<br/>cast a slightly wide net"]
-    S1 --> S2["Step 2 · Vet top 3-5<br/>never stop at star count"]
+    S1["Step 1 · Search<br/>2-3 query variations"] --> S2["Step 2 · Vet top 3-5<br/>never stop at star count"]
 
     S2 --> V1["Read the LICENSE file"]
     S2 --> V2["Maintenance<br/>last commit · issue ratio"]
     S2 --> V3["Fit<br/>read README + skim source"]
     S2 --> V4["Security<br/>dependency CVE scan"]
 
-    V1 --> LIC{"License<br/>found?"}
-    LIC -- "no LICENSE" --> NOLIC["Not usable as a dependency<br/>but may still be a reference<br/>for a from-scratch build"]
-    LIC -- "yes" --> S3
+    V1 -- "no LICENSE" --> NOLIC["Not a dependency,<br/>but still a reference<br/>for a from-scratch build"]
+    V1 --> S3
     V2 --> S3
     V3 --> S3
     V4 --> S3
     NOLIC --> S3
 
-    S3["Step 3 · Rank top 3<br/>each runner-up gets a<br/>specific reason it lost"]
-    S3 --> USABLE{"Usable open-source<br/>candidate survives?"}
+    S3["Step 3 · Rank top 3<br/>each runner-up gets<br/>a specific reason it lost"] --> USABLE{"Candidate<br/>survives?"}
 
     USABLE -- "yes" --> FREE["FREE<br/>use the open-source repo<br/>near-zero tokens"]
-    USABLE -- "no" --> S4["Step 4 · Build vs Buy<br/>two different currencies"]
-    S4 --> BUILD["BUILD<br/>Low / Moderate / High / Very high<br/>token effort + why"]
+    USABLE -- "no" --> S4{"Step 4<br/>Build vs Buy"}
+    S4 --> BUILD["BUILD<br/>Low / Moderate / High<br/>token effort, and why"]
     S4 --> BUY["BUY<br/>near-zero tokens<br/>but $X / month"]
 
-    FREE --> OUT
-    BUILD --> OUT
-    BUY --> OUT
-    OUT["Output<br/>verdict first, one sentence why<br/>+ Verified / Could not verify"]
-
-    subgraph SVC ["External services — the checks are theirs, not Claude's"]
-        GH["GitHub Search MCP<br/>repo search · file reads · secret scanning"]
-        SOCKET["Socket<br/>dependency vulnerability scan"]
-        REG["npm / PyPI<br/>install + trend data"]
-        WEB["Web search<br/>degraded fallback only"]
-    end
-
-    GH -.-> S1
-    REG -.-> S1
-    WEB -.-> DEGRADE
-    GH -.-> V1
-    GH -.-> V2
-    GH -.-> V3
-    SOCKET -.-> V4
-
-    classDef verdict fill:#1a3d1f,stroke:#3fb950,color:#e6edf3
-    classDef build fill:#3d2a12,stroke:#f0883e,color:#e6edf3
+    classDef verdict fill:#12351a,stroke:#3fb950,color:#e6edf3
+    classDef alt fill:#3a2810,stroke:#f0883e,color:#e6edf3
     classDef warn fill:#3d1d1d,stroke:#f85149,color:#e6edf3
-    classDef svc fill:#161b22,stroke:#58a6ff,color:#c9d1d9
-
     class FREE verdict
-    class BUILD,BUY build
-    class WARN,DEGRADE,NOLIC warn
-    class GH,SOCKET,REG,WEB svc
+    class BUILD,BUY alt
+    class WARN,NOLIC warn
 ```
 
-**Reading it in one line:** everything left of Step 4 is trying to avoid spending tokens; Step 4 only runs when that genuinely failed.
+**Reading it in one line:** everything left of Step 4 is trying to avoid spending tokens. Build vs Buy only runs when that genuinely failed.
+
+### Who does the checking
+
+The skill never asserts a license, a maintenance signal, or a CVE on its own. Every check belongs to a named service, and the output says which one ran it.
+
+| Service | Used at | Does | Without it |
+| --- | --- | --- | --- |
+| **GitHub Search MCP** | Steps 1-2 | Repo search, LICENSE and source reads, secret scanning | Falls back to web search — flagged in the output |
+| **Socket** | Step 2 | Scans the candidate's actual dependencies for known CVEs | No automated security check — stated plainly, never implied |
+| **npm / PyPI** | Step 1 | Install counts and trend data for the relevant stack | Ranking loses a popularity signal |
 
 ## Required connectors
 
