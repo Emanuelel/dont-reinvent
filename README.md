@@ -64,53 +64,31 @@ Roughly half of all test cases correctly said **build**, when the free candidate
 
 ```mermaid
 flowchart LR
-    START(["Feature request<br/>'add rate limiting to my API'"]) --> S0
-
-    S0{"Step 0<br/>Connectors<br/>available?"}
-    S0 -- "either missing" --> WARN["Name what is missing<br/>and what is lost without it<br/>Offer the exact fix<br/>Never silently degrade"]
-    WARN --> S1
-    S0 -- "both present" --> S1
-
-    S1["Step 1 · Search<br/>2-3 query variations"] --> S2["Step 2 · Vet top 3-5<br/>never stop at star count"]
-
-    S2 --> V1["Read the LICENSE file"]
-    S2 --> V2["Maintenance<br/>last commit · issue ratio"]
-    S2 --> V3["Fit<br/>read README + skim source"]
-    S2 --> V4["Security<br/>dependency CVE scan"]
-
-    V1 -- "no LICENSE" --> NOLIC["Not a dependency,<br/>but still a reference<br/>for a from-scratch build"]
-    V1 --> S3
-    V2 --> S3
-    V3 --> S3
-    V4 --> S3
-    NOLIC --> S3
-
-    S3["Step 3 · Rank top 3<br/>each runner-up gets<br/>a specific reason it lost"] --> USABLE{"Candidate<br/>survives?"}
-
-    USABLE -- "yes" --> FREE["FREE<br/>use the open-source repo<br/>near-zero tokens"]
-    USABLE -- "no" --> S4{"Step 4<br/>Build vs Buy"}
-    S4 --> BUILD["BUILD<br/>Low / Moderate / High<br/>token effort, and why"]
-    S4 --> BUY["BUY<br/>near-zero tokens<br/>but $X / month"]
+    A(["Feature<br/>request"]) --> B["Search<br/>GitHub · npm / PyPI"]
+    B --> C["Vet for real<br/>license · maintenance · CVEs"]
+    C --> D{"Usable<br/>open-source<br/>candidate?"}
+    D -- "yes" --> FREE["FREE<br/>near-zero tokens"]
+    D -- "no" --> E{"Build<br/>or Buy?"}
+    E --> BUILD["BUILD<br/>costs tokens"]
+    E --> BUY["BUY<br/>costs $ / month"]
 
     classDef verdict fill:#12351a,stroke:#3fb950,color:#e6edf3
     classDef alt fill:#3a2810,stroke:#f0883e,color:#e6edf3
-    classDef warn fill:#3d1d1d,stroke:#f85149,color:#e6edf3
     class FREE verdict
     class BUILD,BUY alt
-    class WARN,NOLIC warn
 ```
 
-**Reading it in one line:** everything left of Step 4 is trying to avoid spending tokens. Build vs Buy only runs when that genuinely failed.
+Everything left of the second diamond is trying to avoid spending tokens. Build vs Buy only runs when that genuinely failed — and a candidate with no LICENSE file exits at the vetting step: not usable as a dependency, though often still a useful reference for a from-scratch build.
 
 ### Who does the checking
 
 The skill never asserts a license, a maintenance signal, or a CVE on its own. Every check belongs to a named service, and the output says which one ran it.
 
-| Service | Used at | Does | Without it |
-| --- | --- | --- | --- |
-| **GitHub Search MCP** | Steps 1-2 | Repo search, LICENSE and source reads, secret scanning | Falls back to web search — flagged in the output |
-| **Socket** | Step 2 | Scans the candidate's actual dependencies for known CVEs | No automated security check — stated plainly, never implied |
-| **npm / PyPI** | Step 1 | Install counts and trend data for the relevant stack | Ranking loses a popularity signal |
+| Service | Does | Without it |
+| --- | --- | --- |
+| **GitHub Search MCP** | Repo search, LICENSE and source reads, secret scanning | Falls back to web search — flagged in the output |
+| **Socket** | Scans the candidate's actual dependencies for known CVEs | No automated security check — stated plainly, never implied |
+| **npm / PyPI** | Install counts and trend data for the relevant stack | Ranking loses a popularity signal |
 
 ## Required connectors
 
