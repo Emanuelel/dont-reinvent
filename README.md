@@ -63,7 +63,7 @@ Roughly half of all test cases correctly said **build**, when the free candidate
 ## How it works
 
 ```mermaid
-flowchart LR
+flowchart TD
     A(["Feature<br/>request"]) --> B["Search<br/>GitHub · npm / PyPI"]
     B --> C["Vet for real<br/>license · maintenance · CVEs"]
     C --> D{"Usable<br/>open-source<br/>candidate?"}
