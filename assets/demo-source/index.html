@@ -5,125 +5,114 @@
     <meta name="viewport" content="width=1920, height=1080" />
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
     <style>
-      @font-face { font-family: 'SFMono-Regular'; src: local('SF Mono'), local('SFMono-Regular'); }
+      @font-face { font-family: "Baskerville"; src: local("Baskerville"); font-weight: 400; }
+      @font-face { font-family: "Baskerville"; src: local("Baskerville Bold"); font-weight: 700; }
+      @font-face { font-family: "Baskerville"; src: local("Baskerville Italic"); font-style: italic; }
+      @font-face { font-family: "SFMono-Regular"; src: local("SF Mono"), local("SFMono-Regular"); }
+
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      html, body {
-        width: 1920px; height: 1080px; overflow: hidden;
-        background: #0d1117;
-      }
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-        color: #e6edf3;
-      }
-      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: #E9E9E5; }
+      body { font-family: "Baskerville", Georgia, serif; color: #1A1A18; }
+
+      .mono { font-family: "SFMono-Regular", Menlo, monospace; }
       .clip { position: absolute; inset: 0; }
 
       /* ---------- top prompt bar ---------- */
       #topbar {
-        position: absolute; left: 0; top: 0; width: 1920px; height: 150px;
-        border-bottom: 1px solid #21262d;
-        display: flex; align-items: center; padding: 0 56px;
+        position: absolute; left: 0; top: 0; width: 1920px; height: 152px;
+        border-bottom: 1px solid #C9C9C2;
+        display: flex; align-items: center; padding: 0 72px;
       }
-      #prompt { font-size: 38px; letter-spacing: -0.01em; color: #e6edf3; }
-      #prompt .sigil { color: #757d87; margin-right: 18px; }
+      #prompt {
+        font-family: "SFMono-Regular", Menlo, monospace;
+        font-size: 34px; letter-spacing: -0.01em; color: #1A1A18;
+      }
+      #prompt .sigil { color: #696964; margin-right: 20px; }
       #caret {
-        display: inline-block; width: 14px; height: 40px; margin-left: 6px;
-        background: #58a6ff; vertical-align: -6px;
+        display: inline-block; width: 11px; height: 34px; margin-left: 8px;
+        background: #1A1A18; vertical-align: -5px;
       }
 
       /* ---------- panels ---------- */
-      .panel {
-        position: absolute; top: 150px; height: 780px;
-        padding: 44px 56px; overflow: hidden;
-      }
+      .panel { position: absolute; top: 152px; height: 768px; padding: 52px 72px; overflow: hidden; }
       #left  { left: 0;    width: 960px; }
       #right { left: 960px; width: 960px; }
-      #divider {
-        position: absolute; left: 959px; top: 150px;
-        width: 2px; height: 780px; background: #21262d;
-      }
+      #divider { position: absolute; left: 959px; top: 152px; width: 1px; height: 768px; background: #C9C9C2; }
 
       .phead {
-        font-size: 23px; font-weight: 650; letter-spacing: 0.14em;
-        text-transform: uppercase; display: flex; align-items: center; gap: 14px;
+        font-family: "SFMono-Regular", Menlo, monospace;
+        font-size: 15px; letter-spacing: 0.26em; text-transform: uppercase;
+        color: #67675F; font-weight: 400;
       }
-      .phead .bar { width: 5px; height: 26px; border-radius: 2px; }
-      #left  .phead { color: #f0883e; }
-      #left  .phead .bar { background: #f0883e; }
-      #right .phead { color: #3fb950; }
-      #right .phead .bar { background: #3fb950; }
 
-      /* ---------- token counters ---------- */
-      .meter { position: absolute; left: 56px; bottom: 44px; }
+      /* ---------- token meters ---------- */
+      .meter { position: absolute; left: 72px; bottom: 52px; }
       .mlabel {
-        font-size: 17px; letter-spacing: 0.18em; text-transform: uppercase;
-        color: #757d87; margin-bottom: 6px;
+        font-family: "SFMono-Regular", Menlo, monospace;
+        font-size: 14px; letter-spacing: 0.24em; text-transform: uppercase;
+        color: #67675F; margin-bottom: 10px;
       }
       .mnum {
-        font-size: 96px; font-weight: 700; letter-spacing: -0.03em;
-        font-variant-numeric: tabular-nums; line-height: 1;
+        font-family: "Baskerville", Georgia, serif;
+        font-size: 104px; font-weight: 400; letter-spacing: -0.02em;
+        font-variant-numeric: tabular-nums lining-nums; line-height: 0.9;
       }
-      #ltok .mnum { color: #f85149; }
-      #rtok .mnum { color: #3fb950; }
+      #ltok .mnum { color: #1A1A18; }
+      #rtok .mnum { color: #2E5E45; }
 
-      /* ---------- left: streaming code ---------- */
+      /* ---------- left: the accumulating listing ---------- */
       #codewrap {
-        position: absolute; left: 56px; right: 56px; top: 130px; height: 430px;
-        overflow: hidden;
-        -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 76%, transparent 100%);
-        mask-image: linear-gradient(to bottom, #000 0%, #000 76%, transparent 100%);
+        position: absolute; left: 72px; right: 72px; top: 118px; height: 420px; overflow: hidden;
+        -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 74%, transparent 100%);
+        mask-image: linear-gradient(to bottom, #000 0%, #000 74%, transparent 100%);
       }
       #codelines { position: absolute; left: 0; top: 0; width: 100%; }
       .cl {
-        font-size: 19px; line-height: 30px; color: #8b949e; white-space: pre;
-        opacity: 0;
+        font-family: "SFMono-Regular", Menlo, monospace;
+        font-size: 17px; line-height: 29px; color: #5C5C56; white-space: pre; opacity: 0;
       }
-      .cl .k { color: #ff7b72; }
-      .cl .f { color: #d2a8ff; }
-      .cl .s { color: #a5d6ff; }
-      .cl .c { color: #757d87; }
+      .cl .k { color: #1A1A18; }
+      .cl .f { color: #3D3D38; }
+      .cl .s { color: #5C5C56; }
+      .cl .c { color: #696964; font-style: italic; }
 
-      /* ---------- right: vetting checks ---------- */
-      #checks { position: absolute; left: 56px; top: 132px; width: 848px; }
+      /* ---------- right: the checks ---------- */
+      #checks { position: absolute; left: 72px; top: 118px; width: 816px; }
       .chk {
-        display: flex; align-items: center; gap: 16px;
-        font-size: 24px; color: #8b949e; height: 46px; opacity: 0;
+        font-family: "SFMono-Regular", Menlo, monospace;
+        display: flex; align-items: baseline; gap: 18px;
+        font-size: 19px; color: #5C5C56; height: 40px; opacity: 0;
       }
-      .chk .tick {
-        width: 26px; height: 26px; border-radius: 50%;
-        background: rgba(63,185,80,0.16); color: #3fb950;
-        font-size: 16px; display: flex; align-items: center; justify-content: center;
-        flex: 0 0 26px;
-      }
-      .chk b { color: #e6edf3; font-weight: 600; }
+      .chk .tick { color: #2E5E45; flex: 0 0 14px; font-size: 16px; }
+      .chk b { color: #1A1A18; font-weight: 400; }
 
-      /* ---------- right: verdict card ---------- */
-      #verdict {
-        position: absolute; left: 56px; top: 322px; width: 848px;
-        border: 1px solid rgba(63,185,80,0.42);
-        border-radius: 14px; background: rgba(63,185,80,0.07);
-        padding: 32px 34px; opacity: 0;
-      }
+      /* ---------- right: the verdict, no box ---------- */
+      #verdict { position: absolute; left: 72px; top: 268px; width: 816px; opacity: 0; }
+      #verdict .rule { height: 1px; background: #1A1A18; margin-bottom: 26px; }
       #verdict .vtag {
-        font-size: 16px; letter-spacing: 0.2em; text-transform: uppercase;
-        color: #3fb950; margin-bottom: 12px;
+        font-family: "SFMono-Regular", Menlo, monospace;
+        font-size: 14px; letter-spacing: 0.24em; text-transform: uppercase;
+        color: #67675F; margin-bottom: 20px;
       }
       #verdict .vmain {
-        font-size: 46px; font-weight: 700; letter-spacing: -0.02em;
-        color: #e6edf3; margin-bottom: 14px;
+        font-size: 52px; font-weight: 400; letter-spacing: -0.015em;
+        line-height: 1.12; color: #1A1A18; margin-bottom: 22px;
       }
-      #verdict .vsub { font-size: 25px; line-height: 1.45; color: #8b949e; }
+      #verdict .vmain em { font-style: italic; color: #2E5E45; }
+      #verdict .vsub {
+        font-family: "SFMono-Regular", Menlo, monospace;
+        font-size: 18px; line-height: 1.55; color: #5C5C56;
+      }
 
       /* ---------- bottom summary ---------- */
       #bottom {
-        position: absolute; left: 0; top: 930px; width: 1920px; height: 150px;
-        border-top: 1px solid #21262d;
+        position: absolute; left: 0; top: 920px; width: 1920px; height: 160px;
+        border-top: 1px solid #C9C9C2;
         display: flex; align-items: center; justify-content: center;
-        gap: 18px; font-size: 35px; opacity: 0;
+        font-size: 34px; color: #5C5C56; opacity: 0; gap: 14px;
       }
-      #bottom .muted { color: #757d87; }
-      #bottom .hot { color: #f85149; font-weight: 700; font-variant-numeric: tabular-nums; }
-      #bottom .cool { color: #3fb950; font-weight: 700; font-variant-numeric: tabular-nums; }
+      #bottom .n { font-variant-numeric: tabular-nums lining-nums; color: #1A1A18; }
+      #bottom .g { font-variant-numeric: tabular-nums lining-nums; color: #2E5E45; }
     </style>
   </head>
   <body>
@@ -141,7 +130,7 @@
 
         <!-- LEFT -->
         <div id="left" class="panel">
-          <div class="phead"><span class="bar"></span>Build it yourself</div>
+          <div class="phead">Build it yourself</div>
           <div id="codewrap" data-layout-allow-overflow data-layout-allow-occlusion>
             <div id="codelines" class="mono" data-layout-allow-overflow data-layout-allow-occlusion>
               <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap><span class="c" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>// rate-limiter.ts</span></div>
@@ -183,15 +172,16 @@
 
         <!-- RIGHT -->
         <div id="right" class="panel">
-          <div class="phead"><span class="bar"></span>dont-reinvent</div>
+          <div class="phead">dont-reinvent</div>
           <div id="checks">
-            <div class="chk"><span class="tick">&check;</span><span>GitHub search &middot; <b>5 candidates</b></span></div>
-            <div class="chk"><span class="tick">&check;</span><span>LICENSE file read &middot; <b>MIT</b></span></div>
-            <div class="chk"><span class="tick">&check;</span><span>Socket scan &middot; <b>no known CVEs</b></span></div>
+            <div class="chk"><span class="tick">&#10003;</span><span>GitHub search &middot; <b>5 candidates</b></span></div>
+            <div class="chk"><span class="tick">&#10003;</span><span>LICENSE file read &middot; <b>MIT</b></span></div>
+            <div class="chk"><span class="tick">&#10003;</span><span>Socket scan &middot; <b>no known CVEs</b></span></div>
           </div>
           <div id="verdict">
+            <div class="rule"></div>
             <div class="vtag">Recommendation</div>
-            <div class="vmain">FREE &mdash; use the open-source library</div>
+            <div class="vmain"><em>Free</em> &mdash; use the open-source library</div>
             <div class="vsub">Mature, MIT-licensed, actively maintained.<br />Near-zero tokens to integrate.</div>
           </div>
           <div class="meter" id="rtok">
@@ -201,11 +191,11 @@
         </div>
 
         <div id="bottom">
-          <span class="muted">Same task.</span>
-          <span class="hot" id="sumL">0</span>
-          <span class="muted">tokens to build it &nbsp;vs&nbsp;</span>
-          <span class="cool" id="sumR">0</span>
-          <span class="muted">to check first.</span>
+          <span>Same task.</span>
+          <span class="n" id="sumL">0</span>
+          <span>tokens to build it, or</span>
+          <span class="g" id="sumR">0</span>
+          <span>to check first.</span>
         </div>
 
       </div>
