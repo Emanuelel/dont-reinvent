@@ -1,3 +1,5 @@
+![Don’t reinvent the wheel — a Claude Skill that checks Free vs. Build vs. Buy before writing code](assets/banner.png)
+
 # dont-reinvent
 
 **Stop your AI coding agent from reinventing the wheel. Save the tokens instead.**
@@ -6,7 +8,7 @@ A Claude Skill that checks Free vs. Build vs. Buy before writing non-trivial cod
 
 ![Free vs. Build: the same task, checked first or built from scratch](assets/demo.gif)
 
-<sub>Token figures in the demo are illustrative of the asymmetry, not measured benchmarks. The point is the shape of the trade — only Build spends tokens — not the specific numbers. Source composition in [`assets/demo-source/`](assets/demo-source/).</sub>
+<sub>The package facts shown &mdash; <code>express-rate-limit</code>, MIT, 3.3k stars, 2 runtime dependencies &mdash; were verified against the repository. The token and duration figures are illustrative of the asymmetry, not measured benchmarks. Source composition in <a href="assets/demo-source/">assets/demo-source/</a>.</sub>
 
 ## Install
 
