@@ -23,6 +23,19 @@ This skill depends on two MCP connectors: **GitHub Search MCP** (for real repo s
   - Explain in one sentence what it's for and what's lost without it (e.g. "Without Socket connected, I can't check whether this repo's dependencies have known vulnerabilities. I'd be guessing.").
   - Give the concrete next step to connect it: for a connector already in Anthropic's directory, that's Settings > Connectors > Add and search by name; for one that requires a custom URL (like GitHub's or Socket's official MCP server), give the exact URL and note whether it needs OAuth login or an API token.
   - Ask whether the user wants to connect it now, or proceed anyway with a clearly weaker fallback (general web search instead of GitHub search; no automated security check instead of a real one).
+- **Diagnose a failing connector before reporting it. Never assume a cause.**
+  A tool call that fails is not evidence that the service is down. Several different conditions produce failures that look identical from the outside, and each has a different fix:
+  - **Not authenticated** — the connector is installed but was never signed in. This is the most common cause and the one most often misread as an outage.
+  - **Not installed** — the connector was never added to this client.
+  - **Genuinely erroring or unreachable** — the service itself is failing.
+
+  Some tools return only a generic message (e.g. `Tool execution failed`) that hides which of these it is. Retrying such a call proves nothing; five identical failures are still one unexplained failure. Before saying anything about the cause:
+  1. Call a second, cheaper tool on the same server (for Socket, `organizations`; for GitHub, `get_me`). The clearer error usually surfaces there.
+  2. If every tool on that server fails the same way, the problem is the connector, not the tool.
+  3. Report only what the errors actually said. Never write "down", "unavailable", or "unreachable" unless a check established that.
+
+- **If the cause is authentication, prompt the user to authenticate.** That is a thirty-second fix on their side; calling it an outage sends them off to wait for something that will never resolve on its own. Name the connector, say plainly that it needs signing in (OAuth login or an API token, whichever applies), and offer to re-run the check as soon as they confirm. Do not proceed to a degraded fallback without asking first.
+
 - **Never silently fall back.** If you proceed without a connector, whether because the user said to or because you have no way to prompt (e.g. an automated/non-interactive run), the final output must say so explicitly (see "Verified / Could not verify" in the output format). Never quietly do a worse job and present it with the same confidence as a fully-checked one.
 - Do this check once per conversation, not on every single invocation within the same chat. No need to re-ask if the user already answered earlier in this session.
 
@@ -110,4 +123,5 @@ Could not verify: <anything you couldn't confirm, say this plainly if it applies
 - Don't skip Step 0, Step 1, or Step 2 even if the user seems to already be leaning toward building or paying.
 - Never silently degrade. If GitHub Search MCP or Socket security scan isn't connected, say so and offer to help connect it. Don't quietly fall back to web search or skip the security check without flagging it, even once.
 - Never tell the user to go verify something themselves. That's this skill's job. If you genuinely can't verify it with available tools, say plainly that it's unverified, as a caveat on the recommendation, not as homework for the user.
+- Never assume why a tool call failed. A generic failure is not an outage: probe a second tool on the same server first, and if it turns out to be authentication, prompt the user to sign in rather than reporting the connector as down or quietly degrading.
 - Never recommend a specific paid vendor because of any partnership/connector relationship. Recommendations stay neutral, cost-based only.
