@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: 'SFMono-Regular'; src: local('SF Mono'), local('SFMono-Regular'); }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        width: 1920px; height: 1080px; overflow: hidden;
+        background: #0d1117;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        color: #e6edf3;
+      }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+      .clip { position: absolute; inset: 0; }
+
+      /* ---------- top prompt bar ---------- */
+      #topbar {
+        position: absolute; left: 0; top: 0; width: 1920px; height: 150px;
+        border-bottom: 1px solid #21262d;
+        display: flex; align-items: center; padding: 0 56px;
+      }
+      #prompt { font-size: 38px; letter-spacing: -0.01em; color: #e6edf3; }
+      #prompt .sigil { color: #757d87; margin-right: 18px; }
+      #caret {
+        display: inline-block; width: 14px; height: 40px; margin-left: 6px;
+        background: #58a6ff; vertical-align: -6px;
+      }
+
+      /* ---------- panels ---------- */
+      .panel {
+        position: absolute; top: 150px; height: 780px;
+        padding: 44px 56px; overflow: hidden;
+      }
+      #left  { left: 0;    width: 960px; }
+      #right { left: 960px; width: 960px; }
+      #divider {
+        position: absolute; left: 959px; top: 150px;
+        width: 2px; height: 780px; background: #21262d;
+      }
+
+      .phead {
+        font-size: 23px; font-weight: 650; letter-spacing: 0.14em;
+        text-transform: uppercase; display: flex; align-items: center; gap: 14px;
+      }
+      .phead .bar { width: 5px; height: 26px; border-radius: 2px; }
+      #left  .phead { color: #f0883e; }
+      #left  .phead .bar { background: #f0883e; }
+      #right .phead { color: #3fb950; }
+      #right .phead .bar { background: #3fb950; }
+
+      /* ---------- token counters ---------- */
+      .meter { position: absolute; left: 56px; bottom: 44px; }
+      .mlabel {
+        font-size: 17px; letter-spacing: 0.18em; text-transform: uppercase;
+        color: #757d87; margin-bottom: 6px;
+      }
+      .mnum {
+        font-size: 96px; font-weight: 700; letter-spacing: -0.03em;
+        font-variant-numeric: tabular-nums; line-height: 1;
+      }
+      #ltok .mnum { color: #f85149; }
+      #rtok .mnum { color: #3fb950; }
+
+      /* ---------- left: streaming code ---------- */
+      #codewrap {
+        position: absolute; left: 56px; right: 56px; top: 130px; height: 430px;
+        overflow: hidden;
+        -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 76%, transparent 100%);
+        mask-image: linear-gradient(to bottom, #000 0%, #000 76%, transparent 100%);
+      }
+      #codelines { position: absolute; left: 0; top: 0; width: 100%; }
+      .cl {
+        font-size: 19px; line-height: 30px; color: #8b949e; white-space: pre;
+        opacity: 0;
+      }
+      .cl .k { color: #ff7b72; }
+      .cl .f { color: #d2a8ff; }
+      .cl .s { color: #a5d6ff; }
+      .cl .c { color: #757d87; }
+
+      /* ---------- right: vetting checks ---------- */
+      #checks { position: absolute; left: 56px; top: 132px; width: 848px; }
+      .chk {
+        display: flex; align-items: center; gap: 16px;
+        font-size: 24px; color: #8b949e; height: 46px; opacity: 0;
+      }
+      .chk .tick {
+        width: 26px; height: 26px; border-radius: 50%;
+        background: rgba(63,185,80,0.16); color: #3fb950;
+        font-size: 16px; display: flex; align-items: center; justify-content: center;
+        flex: 0 0 26px;
+      }
+      .chk b { color: #e6edf3; font-weight: 600; }
+
+      /* ---------- right: verdict card ---------- */
+      #verdict {
+        position: absolute; left: 56px; top: 322px; width: 848px;
+        border: 1px solid rgba(63,185,80,0.42);
+        border-radius: 14px; background: rgba(63,185,80,0.07);
+        padding: 32px 34px; opacity: 0;
+      }
+      #verdict .vtag {
+        font-size: 16px; letter-spacing: 0.2em; text-transform: uppercase;
+        color: #3fb950; margin-bottom: 12px;
+      }
+      #verdict .vmain {
+        font-size: 46px; font-weight: 700; letter-spacing: -0.02em;
+        color: #e6edf3; margin-bottom: 14px;
+      }
+      #verdict .vsub { font-size: 25px; line-height: 1.45; color: #8b949e; }
+
+      /* ---------- bottom summary ---------- */
+      #bottom {
+        position: absolute; left: 0; top: 930px; width: 1920px; height: 150px;
+        border-top: 1px solid #21262d;
+        display: flex; align-items: center; justify-content: center;
+        gap: 18px; font-size: 35px; opacity: 0;
+      }
+      #bottom .muted { color: #757d87; }
+      #bottom .hot { color: #f85149; font-weight: 700; font-variant-numeric: tabular-nums; }
+      #bottom .cool { color: #3fb950; font-weight: 700; font-variant-numeric: tabular-nums; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="12"
+         data-width="1920" data-height="1080">
+      <div id="scene" class="clip" data-start="0" data-duration="12">
+
+        <div id="topbar">
+          <div id="prompt" class="mono">
+            <span class="sigil">&gt;</span><span id="ptext"></span><span id="caret"></span>
+          </div>
+        </div>
+
+        <div id="divider"></div>
+
+        <!-- LEFT -->
+        <div id="left" class="panel">
+          <div class="phead"><span class="bar"></span>Build it yourself</div>
+          <div id="codewrap" data-layout-allow-overflow data-layout-allow-occlusion>
+            <div id="codelines" class="mono" data-layout-allow-overflow data-layout-allow-occlusion>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap><span class="c" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>// rate-limiter.ts</span></div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap><span class="k" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>import</span> { Redis } <span class="k" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>from</span> <span class="s" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>"ioredis"</span>;</div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap></div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap><span class="k" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>interface</span> <span class="f" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>Bucket</span> {</div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>  tokens: <span class="f" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>number</span>;</div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>  updatedAt: <span class="f" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>number</span>;</div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>}</div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap></div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap><span class="k" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>export class</span> <span class="f" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>RateLimiter</span> {</div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>  <span class="k" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>private</span> redis: Redis;</div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>  <span class="k" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>private</span> capacity: <span class="f" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>number</span>;</div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>  <span class="k" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>private</span> refillRate: <span class="f" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>number</span>;</div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap></div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>  <span class="k" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>async</span> <span class="f" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>consume</span>(key: <span class="f" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>string</span>, n = <span class="s" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>1</span>) {</div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>    <span class="k" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>const</span> raw = <span class="k" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>await</span> <span class="k" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>this</span>.redis.<span class="f" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>get</span>(key);</div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>    <span class="k" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>let</span> b: Bucket = raw ? <span class="f" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>JSON</span>.<span class="f" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>parse</span>(raw) : ...</div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>    <span class="c" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>// TODO: clock skew across nodes</span></div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>    <span class="k" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>const</span> elapsed = now - b.updatedAt;</div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>    b.tokens = <span class="f" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>Math</span>.<span class="f" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>min</span>(capacity, b.tokens + ...</div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>    <span class="k" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>if</span> (b.tokens &lt; n) <span class="k" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>return</span> { ok: <span class="k" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>false</span> };</div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>    <span class="c" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>// TODO: this read-modify-write races</span></div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>    <span class="k" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>await</span> <span class="k" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>this</span>.redis.<span class="f" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>set</span>(key, <span class="f" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>JSON</span>.<span class="f" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>stringify</span>(b));</div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>  }</div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap></div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>  <span class="c" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>// TODO: sliding window variant</span></div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>  <span class="c" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>// TODO: retry-after header</span></div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>  <span class="c" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>// TODO: distributed lock</span></div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>  <span class="c" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>// TODO: tests</span></div>
+              <div class="cl" data-layout-allow-overflow data-layout-allow-occlusion data-layout-allow-overlap>}</div>
+            </div>
+          </div>
+          <div class="meter" id="ltok">
+            <div class="mlabel">Tokens spent</div>
+            <div class="mnum">0</div>
+          </div>
+        </div>
+
+        <!-- RIGHT -->
+        <div id="right" class="panel">
+          <div class="phead"><span class="bar"></span>dont-reinvent</div>
+          <div id="checks">
+            <div class="chk"><span class="tick">&check;</span><span>GitHub search &middot; <b>5 candidates</b></span></div>
+            <div class="chk"><span class="tick">&check;</span><span>LICENSE file read &middot; <b>MIT</b></span></div>
+            <div class="chk"><span class="tick">&check;</span><span>Socket scan &middot; <b>no known CVEs</b></span></div>
+          </div>
+          <div id="verdict">
+            <div class="vtag">Recommendation</div>
+            <div class="vmain">FREE &mdash; use the open-source library</div>
+            <div class="vsub">Mature, MIT-licensed, actively maintained.<br />Near-zero tokens to integrate.</div>
+          </div>
+          <div class="meter" id="rtok">
+            <div class="mlabel">Tokens spent</div>
+            <div class="mnum">0</div>
+          </div>
+        </div>
+
+        <div id="bottom">
+          <span class="muted">Same task.</span>
+          <span class="hot" id="sumL">0</span>
+          <span class="muted">tokens to build it &nbsp;vs&nbsp;</span>
+          <span class="cool" id="sumR">0</span>
+          <span class="muted">to check first.</span>
+        </div>
+
+      </div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      const PROMPT = "add rate limiting to my API";
+      const ptext = document.getElementById("ptext");
+      const lines = gsap.utils.toArray("#codelines .cl");
+
+      // number formatting helper (deterministic)
+      const fmt = (n) => Math.round(n).toLocaleString("en-US");
+
+      // --- 0.0-1.4  prompt types in ---
+      tl.to({ i: 0 }, {
+        i: PROMPT.length, duration: 1.3, ease: "none",
+        onUpdate: function () {
+          ptext.textContent = PROMPT.slice(0, Math.round(this.targets()[0].i));
+        }
+      }, 0);
+      tl.to("#caret", { opacity: 0.15, duration: 0.4, repeat: 7, yoyo: true, ease: "none" }, 1.4);
+
+      // --- 1.5-7.0  LEFT: code streams in, panel scrolls, counter races ---
+      tl.to(lines, {
+        opacity: 1, duration: 0.18, ease: "none",
+        stagger: { each: 0.155, from: "start" }
+      }, 1.5);
+      tl.to("#codelines", { y: -300, duration: 4.4, ease: "none" }, 2.6);
+      tl.to({ v: 0 }, {
+        v: 47300, duration: 5.5, ease: "power1.inOut",
+        onUpdate: function () {
+          document.querySelector("#ltok .mnum").textContent = fmt(this.targets()[0].v);
+        }
+      }, 1.5);
+
+      // --- 1.6-3.1  RIGHT: three vetting checks stamp in ---
+      tl.fromTo(".chk",
+        { opacity: 0, x: -18 },
+        { opacity: 1, x: 0, duration: 0.34, ease: "power2.out", stagger: 0.46 }, 1.6);
+      tl.fromTo(".chk .tick",
+        { scale: 0.4 },
+        { scale: 1, duration: 0.34, ease: "back.out(2.6)", stagger: 0.46 }, 1.6);
+
+      // --- 3.3  RIGHT: verdict snaps in, one beat ---
+      tl.fromTo("#verdict",
+        { opacity: 0, y: 26, scale: 0.975 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.46, ease: "back.out(1.5)" }, 3.35);
+      tl.to({ v: 0 }, {
+        v: 210, duration: 0.8, ease: "power2.out",
+        onUpdate: function () {
+          document.querySelector("#rtok .mnum").textContent = fmt(this.targets()[0].v);
+        }
+      }, 3.35);
+
+      // --- 7.4  bottom summary ---
+      tl.to("#bottom", { opacity: 1, duration: 0.5, ease: "power2.out" }, 7.4);
+      tl.to({ v: 0 }, {
+        v: 47300, duration: 0.9, ease: "power2.out",
+        onUpdate: function () {
+          document.getElementById("sumL").textContent = fmt(this.targets()[0].v);
+        }
+      }, 7.5);
+      tl.to({ v: 0 }, {
+        v: 210, duration: 0.9, ease: "power2.out",
+        onUpdate: function () {
+          document.getElementById("sumR").textContent = fmt(this.targets()[0].v);
+        }
+      }, 7.5);
+
+      // hold to 12.0 for the loop rest
+      tl.to({}, { duration: 0.1 }, 11.9);
+
+      tl.seek(0);
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

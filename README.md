@@ -4,6 +4,10 @@
 
 A Claude Skill that checks Free vs. Build vs. Buy before writing non-trivial code, and actually vets what it finds (license, maintenance, security) instead of stopping at star count.
 
+![Free vs. Build: the same task, checked first or built from scratch](assets/demo.gif)
+
+<sub>Token figures in the demo are illustrative of the asymmetry, not measured benchmarks. The point is the shape of the trade — only Build spends tokens — not the specific numbers. Source composition in [`assets/demo-source/`](assets/demo-source/).</sub>
+
 ## Install
 
 As a Claude Code plugin:
