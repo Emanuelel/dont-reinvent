@@ -4,8 +4,6 @@
 
 **Stop your AI coding agent from reinventing the wheel. Save the tokens instead.**
 
-[![skills.sh](https://skills.sh/b/Emanuelel/dont-reinvent)](https://skills.sh/Emanuelel/dont-reinvent)
-
 A Claude Skill that checks Free vs. Build vs. Buy before writing non-trivial code, and actually vets what it finds (license, maintenance, security) instead of stopping at star count.
 
 ![Free vs. Build: the same task, checked first or built from scratch](assets/demo.gif)
