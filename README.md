@@ -23,15 +23,6 @@ Claude Code picks it up within the session, no restart needed. To scope it to a 
 
 **Claude.ai, Cowork, and cloud sessions.** These don't read `~/.claude/skills/` on your machine; they load the skills enabled for your Claude account. Add [`skills/dont-reinvent/SKILL.md`](skills/dont-reinvent/SKILL.md) from the skills settings on claude.ai, or from **Customize** in the desktop app sidebar, then enable it.
 
-**As a Claude Code plugin.** Useful if you already manage extensions this way:
-
-```
-/plugin marketplace add Emanuelel/dont-reinvent
-/plugin install dont-reinvent@emanuelel-dont-reinvent
-```
-
-Plugin skills are namespaced by their plugin, so this route invokes it as `/dont-reinvent:dont-reinvent` rather than `/dont-reinvent`.
-
 ## Why this matters more now, not less
 
 Build vs. buy used to be a slow decision. A developer's time and salary were the real cost of "build," so people naturally checked npm, Stack Overflow, or a vendor page first. Buying or reusing was often the *faster* path, and that friction kept the decision honest.
