@@ -18,6 +18,8 @@ npx skills add Emanuelel/dont-reinvent
 
 Works with Claude Code, Cursor, Codex, Copilot and ~70 other agents. Add `-g` to install globally instead of into the current project.
 
+Also listed on [skills.sh](https://skills.sh/Emanuelel/dont-reinvent/dont-reinvent).
+
 <details>
 <summary><strong>Other ways in</strong> &mdash; by hand, or on claude.ai</summary>
 
