@@ -4,6 +4,8 @@
 
 **Stop your AI coding agent from reinventing the wheel. Save the tokens instead.**
 
+[![skills.sh](https://skills.sh/b/Emanuelel/dont-reinvent)](https://skills.sh/Emanuelel/dont-reinvent)
+
 A Claude Skill that checks Free vs. Build vs. Buy before writing non-trivial code, and actually vets what it finds (license, maintenance, security) instead of stopping at star count.
 
 ![Free vs. Build: the same task, checked first or built from scratch](assets/demo.gif)
@@ -12,16 +14,24 @@ A Claude Skill that checks Free vs. Build vs. Buy before writing non-trivial cod
 
 ## Install
 
-**Claude Code.** Copy the skill into your personal skills folder. This is the simplest route and gives you a clean `/dont-reinvent`:
+**Any coding agent (recommended).** One command, no registration, works with Claude Code, Cursor, Codex, Copilot and ~70 other agents:
+
+```bash
+npx skills add Emanuelel/dont-reinvent
+```
+
+Add `-g` to install globally rather than into the current project. This uses [skills.sh](https://skills.sh), the CLI for the open [Agent Skills](https://agentskills.io) standard.
+
+**Claude Code, by hand.** If you would rather not run an installer:
 
 ```bash
 git clone https://github.com/Emanuelel/dont-reinvent.git
 cp -r dont-reinvent/skills/dont-reinvent ~/.claude/skills/
 ```
 
-Claude Code picks it up within the session, no restart needed. To scope it to a single project instead, copy the folder into that repo's `.claude/skills/` and commit it, so anyone working on the repo gets it too.
+Claude Code picks it up within the session, no restart needed. To scope it to one project instead, copy the folder into that repo's `.claude/skills/` and commit it.
 
-**Claude.ai, Cowork, and cloud sessions.** These don't read `~/.claude/skills/` on your machine; they load the skills enabled for your Claude account. Add [`skills/dont-reinvent/SKILL.md`](skills/dont-reinvent/SKILL.md) from the skills settings on claude.ai, or from **Customize** in the desktop app sidebar, then enable it.
+**Claude.ai, Cowork, and cloud sessions.** These don't read `~/.claude/skills/` on your machine; they load the skills enabled for your Claude account, and custom skills are uploaded as a zip. Download [`dist/dont-reinvent.zip`](dist/dont-reinvent.zip), then go to **Customize → Skills**, click **+ Create skill**, and upload it. Requires a plan with code execution enabled.
 
 ## Why this matters more now, not less
 
