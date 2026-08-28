@@ -12,19 +12,25 @@ A Claude Skill that checks Free vs. Build vs. Buy before writing non-trivial cod
 
 ## Install
 
-As a Claude Code plugin:
+**Claude Code.** Copy the skill into your personal skills folder. This is the simplest route and gives you a clean `/dont-reinvent`:
+
+```bash
+git clone https://github.com/Emanuelel/dont-reinvent.git
+cp -r dont-reinvent/skills/dont-reinvent ~/.claude/skills/
+```
+
+Claude Code picks it up within the session, no restart needed. To scope it to a single project instead, copy the folder into that repo's `.claude/skills/` and commit it, so anyone working on the repo gets it too.
+
+**Claude.ai, Cowork, and cloud sessions.** These don't read `~/.claude/skills/` on your machine; they load the skills enabled for your Claude account. Add [`skills/dont-reinvent/SKILL.md`](skills/dont-reinvent/SKILL.md) from the skills settings on claude.ai, or from **Customize** in the desktop app sidebar, then enable it.
+
+**As a Claude Code plugin.** Useful if you already manage extensions this way:
 
 ```
 /plugin marketplace add Emanuelel/dont-reinvent
 /plugin install dont-reinvent@emanuelel-dont-reinvent
 ```
 
-Or manually, by copying the skill into your skills directory:
-
-```
-git clone https://github.com/Emanuelel/dont-reinvent.git
-cp -r dont-reinvent/skills/dont-reinvent ~/.claude/skills/
-```
+Plugin skills are namespaced by their plugin, so this route invokes it as `/dont-reinvent:dont-reinvent` rather than `/dont-reinvent`.
 
 ## Why this matters more now, not less
 
@@ -113,4 +119,6 @@ If either is missing, the skill says so explicitly and offers to help connect it
 
 ## Status
 
-Working, tested against real build-vs-buy calls across several problem domains. Currently in active personal use, not yet packaged for wider distribution.
+Released and in use. Tested against real build-vs-buy calls across several problem domains: API rate limiting, cost-based multi-model LLM routing, comment-triggered social automation, and technical site auditing. Roughly half of those correctly came back "build."
+
+Issues and pull requests welcome, especially a report of a call it got wrong.
