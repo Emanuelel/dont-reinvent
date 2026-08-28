@@ -14,24 +14,27 @@ A Claude Skill that checks Free vs. Build vs. Buy before writing non-trivial cod
 
 ## Install
 
-**Any coding agent (recommended).** One command, no registration, works with Claude Code, Cursor, Codex, Copilot and ~70 other agents:
-
 ```bash
 npx skills add Emanuelel/dont-reinvent
 ```
 
-Add `-g` to install globally rather than into the current project. This uses [skills.sh](https://skills.sh), the CLI for the open [Agent Skills](https://agentskills.io) standard.
+Works with Claude Code, Cursor, Codex, Copilot and ~70 other agents. Add `-g` to install globally instead of into the current project.
 
-**Claude Code, by hand.** If you would rather not run an installer:
+<details>
+<summary><strong>Other ways in</strong> &mdash; by hand, or on claude.ai</summary>
+
+Copy it into your Claude Code skills folder yourself:
 
 ```bash
 git clone https://github.com/Emanuelel/dont-reinvent.git
 cp -r dont-reinvent/skills/dont-reinvent ~/.claude/skills/
 ```
 
-Claude Code picks it up within the session, no restart needed. To scope it to one project instead, copy the folder into that repo's `.claude/skills/` and commit it.
+Claude Code picks it up within the session, no restart needed. To scope it to one project, copy the folder into that repo's `.claude/skills/` and commit it.
 
-**Claude.ai, Cowork, and cloud sessions.** These don't read `~/.claude/skills/` on your machine; they load the skills enabled for your Claude account, and custom skills are uploaded as a zip. Download [`dist/dont-reinvent.zip`](dist/dont-reinvent.zip), then go to **Customize → Skills**, click **+ Create skill**, and upload it. Requires a plan with code execution enabled.
+**claude.ai, Cowork, and cloud sessions** don't read `~/.claude/skills/` on your machine; they load the skills enabled for your Claude account, and custom skills are uploaded as a zip. Download [`dist/dont-reinvent.zip`](dist/dont-reinvent.zip), then go to **Customize → Skills**, click **+ Create skill**, and upload it. Requires a plan with code execution enabled.
+
+</details>
 
 ## Why this matters more now, not less
 
